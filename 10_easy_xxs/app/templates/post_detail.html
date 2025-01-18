@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+    
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ post['title'] }}</h1>
+        
+        <div class="flex justify-between items-center text-sm text-gray-500 mb-8">
+            <div>
+                <span class="font-semibold text-gray-600">{{ post['username'] }}</span> 
+                / {{ post['created_at']}} 
+            </div>
+  
+            <div class="flex items-center">
+                <form id="adminNotifyForm" action="{{ url_for('admin_notify', post_id=post['id']) }}" method="POST" onsubmit="disableButton()">
+                    <button id="adminNotifyButton" type="submit" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">
+                        <i class="fas fa-bell text-white mr-2"></i> 관리자 호출
+                    </button>
+                </form>
+            </div>
+            
+        </div>
+
+        <div class="prose prose-lg text-gray-700">
+            {{ post['content'] | safe }}  
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">댓글</h2>
+            {% for comment in comments %}
+                <div class="bg-gray-100 p-4 mb-4 rounded-lg">
+                    <div class="text-sm text-gray-600 mb-2">
+                        {{ comment['username'] }} / {{ comment['created_at'] }}
+                    </div>
+                    <div class="text-gray-700">{{ comment['content'] }}</div>
+                </div>
+            {% else %}
+                <p class="text-gray-600">댓글이 없습니다.</p>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6">
+            <form action="{{ url_for('post_detail', post_id=post['id']) }}" method="POST">
+                <textarea name="comment" rows="4" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          {% if not is_admin %} disabled placeholder="관리자만 답변할 수 있습니다." {% endif %}></textarea>
+                <div class="text-right mt-2">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded" name="comment_to_submit"
+                            {% if not is_admin %} disabled {% endif %}>
+                        등록
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- JavaScript to disable the button after click -->
+    <script>
+        function disableButton() {
+            // 버튼 비활성화 및 텍스트 변경
+            const button = document.getElementById('adminNotifyButton');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 요청 중...';
+
+            // 폼 제출 후 비활성화 상태 유지
+            document.getElementById('adminNotifyForm').submit();
+        }
+    </script>
+{% endblock %}

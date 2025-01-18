@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1 class="text-2xl font-bold mb-4">게시글 목록</h1>
+
+    {% if posts %}
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full bg-white shadow-md rounded-lg">
+                <thead class="bg-gray-100 border-b">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-sm text-gray-600 w-16">번호</th> <!-- 번호 고정 길이 -->
+                        <th class="px-4 py-2 text-left text-sm text-gray-600">제목</th> <!-- 제목 -->
+                        <th class="px-4 py-2 text-left text-sm text-gray-600 w-32">작성자</th> <!-- 작성자 고정 길이 -->
+                        <th class="px-4 py-2 text-left text-sm text-gray-600 w-40">작성일</th> <!-- 날짜 고정 길이 -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="border px-4 py-2 text-gray-700 text-sm w-16">{{ post['id'] }}</td> <!-- 번호 -->
+                        <td class="border px-4 py-2 text-blue-500 text-sm">
+                            <a href="{{ url_for('post_detail', post_id=post['id']) }}" class="hover:underline">
+                                {{ post['title'] }}
+                            </a>
+                        </td> <!-- 제목 -->
+                        <td class="border px-4 py-2 text-gray-700 text-sm w-32">{{ post['username'] }}</td> <!-- 작성자 -->
+                        <td class="border px-4 py-2 text-gray-700 text-sm w-40">{{ post['created_at'][:10] }}</td> <!-- 작성일 -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-600">작성된 게시글이 없습니다.</p>
+    {% endif %}
+{% endblock %}

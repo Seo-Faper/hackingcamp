@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST" class="bg-white p-4 shadow-md rounded">
+    <label class="block text-sm font-bold mb-2">사용자명</label>
+    <input type="text" name="username" class="border p-2 w-full mb-4" required>
+
+    <label class="block text-sm font-bold mb-2">비밀번호</label>
+    <input type="password" name="password" class="border p-2 w-full mb-4" required>
+
+    <button type="submit" class="bg-blue-500 text-white p-2 rounded">회원가입</button>
+</form>
+{% endblock %}

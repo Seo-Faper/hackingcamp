@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL Shell</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* 전체 페이지 스타일 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: monospace;
+            background-color: #1e1e1e;
+            color: #d1d5db;
+        }
+
+        /* 터미널 콘솔 스타일 */
+        #console {
+            width: 700px;
+            height: 500px;
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 애플 OS 둥근 색상 원 */
+        .title-bar {
+            display: flex;
+            gap: 8px;
+            position: absolute;
+            top: 10px;
+            left: 15px;
+        }
+        .title-bar .circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .red { background-color: #ff5f56; }
+        .yellow { background-color: #ffbd2e; }
+        .green { background-color: #27c93f; }
+
+        /* 출력 영역 스타일 */
+        #output {
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #3c3c3c;
+            margin-top: 30px;
+            flex: 1;
+        }
+
+        /* 명령어 입력 영역 */
+        #input-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .prompt {
+            color: #7aa2f7;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        /* 실제 입력 div 스타일 */
+        #query {
+            background-color: #1e1e1e;
+            color: #d1d5db;
+            border: none;
+            outline: none;
+            font-family: monospace;
+            font-size: 14px;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+        }
+        /* 가상 커서 스타일 */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background-color: #d1d5db;
+            margin-left: 2px;
+            animation: blink 1s steps(1) infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="console">
+        <div class="title-bar">
+            <div class="circle red"></div>
+            <div class="circle yellow"></div>
+            <div class="circle green"></div>
+        </div>
+        <div id="output">SQL Shell의 협곡에 오신 것을 환영합니다! 명령어를 입력하세요.</div>
+        <div id="input-container">
+            <span class="prompt">user@sqlite:~$</span>
+            <div id="query" contenteditable="true"></div>
+            <div class="cursor"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // 포커스를 커스텀 요소로 설정하여 기본 커서 숨기기
+            $('#query').focus();
+            $('#query').on('focus', function() {
+                document.execCommand('selectAll', false, null);  // 기본 커서를 숨기기 위해 모든 텍스트 선택
+                document.getSelection().collapseToEnd();  // 텍스트 뒤로 커서 이동
+            });
+
+            // 키보드 입력 이벤트 처리
+            $('#query').on('input', function() {
+                positionCursor();  // 가상 커서 위치 조정
+            });
+
+            $('#query').on('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    executeQuery();  // Enter 키로 명령어 실행
+                }
+            });
+
+            // 명령어 실행 함수
+            function executeQuery() {
+                let query = $('#query').text().trim();
+                
+                if (query === "") {
+                    return;
+                }
+
+                // AJAX로 SQL 쿼리 실행
+                $.post('/execute', { query: query }, function(data) {
+                    $('#output').append(`\nuser@sqlite:~$ ${query}\n${data}`);
+                    $('#query').empty();  // 실행 후 입력란 초기화
+                    $('#output').scrollTop($('#output')[0].scrollHeight);  // 스크롤을 맨 아래로
+                    positionCursor();  // 커서 위치 재조정
+                }, 'text');
+            }
+
+            // 가상 커서 위치 조정
+            function positionCursor() {
+                $('.cursor').css({
+                    position: 'relative',
+                    left: `${$('#query').width()}px`
+                });
+            }
+        });
+    </script>
+</body>
+</html>

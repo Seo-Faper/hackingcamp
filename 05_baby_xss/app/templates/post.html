@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST" class="bg-white p-4 shadow-md rounded">
+    <label class="block text-sm font-bold mb-2">제목</label>
+    <input type="text" name="title" class="border p-2 w-full mb-4" required>
+
+    <label class="block text-sm font-bold mb-2">본문</label>
+    <textarea name="content" class="border p-2 w-full mb-4" rows="5" required></textarea>
+
+    <button type="submit" class="bg-blue-500 text-white p-2 rounded">작성하기</button>
+</form>
+{% endblock %}
